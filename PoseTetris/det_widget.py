@@ -72,6 +72,7 @@ class CDetWidget(QWidget, cUi):
         painter.setPen(pen)
         painter.drawRect(0, 0, self.width(), self.height())
         
+    # 画人体姿态识别的线条
     def draw_infer_kp(self, painter):
         if self.kps is None:
             return

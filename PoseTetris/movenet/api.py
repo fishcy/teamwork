@@ -17,7 +17,7 @@ class Infer(object):
 
     def infer(self, image, input_size=192):
         time1 = time.time()
-
+        # 通过cv2对图像进行处理
         infer_img, src_img = process_input(image, size=192)
         input_image = torch.Tensor(infer_img) # .cuda()
         with torch.no_grad():

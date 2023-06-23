@@ -246,10 +246,11 @@ class CMainWidget(QWidget, cUi):
                 #img = cv2.imread('change.jpg')
                 ##Debug
                 
-                #送到网络监测
+                #送到网络监测 获取人体关键节点信息。
                 kps = self.infer.infer(img)
                 score_min = np.array(kps[:, 2]).min()
                 show_info = ''
+                # 根据置信度 判断是否检测到人物。
                 if score_min < 0.1:
                     print('no total people deted, ignore')
                     show_info = 'no people'
@@ -270,10 +271,14 @@ class CMainWidget(QWidget, cUi):
                     pose_map['r_knee'] = [kps[13][1], kps[13][0]] 
                     pose_map['l_ankle'] = [kps[16][1], kps[16][0]] 
                     pose_map['r_ankle'] = [kps[15][1], kps[15][0]] 
+
+
+                    # 人体姿态 预测
                     all_score = []
                     all_pos = []
                     max_score = 0
                     max_pos = ''
+                    # 计算与每个动作的置信度，选择置信度最高的，并且大于90
                     score_left = self.pose_left_widget.calcuate_similar(pose_map)
                     max_score = score_left
                     max_pos = 'left'
@@ -289,7 +294,6 @@ class CMainWidget(QWidget, cUi):
                     if score > max_score:
                         max_score = score
                         max_pos = 'change'
-                    
                     if max_score > 90:
                         now_time = time.time()
                         if now_time - self.last_cmd_time > 1.5:

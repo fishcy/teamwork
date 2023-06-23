@@ -94,7 +94,7 @@ class CPoseWidget(QWidget, cUi):
             return True
         else:
             return False    
-
+# 计算 动作得分。  主要的思想：通过关键节点连成的直线，计算动作的直线与标准的动作直线形成的角度，通过角度来获评分。
     def calcuate_similar(self, pos_map):           
         std_lines = self._get_lines(self.point_map)
         cmp_lines = self._get_lines(pos_map)
