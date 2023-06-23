@@ -24,12 +24,7 @@ class Infer(object):
             # 模型 人体姿态检测
             kpt_with_conf = self.model(input_image)[0, 0, :, :]
             kpt_with_conf = kpt_with_conf.detach().cpu().numpy()
-            #print('infer spend: %.4f'%(time.time()-time1))
-            #return kpt_with_conf
-            #draw_image = draw_skel_and_kp(src_img, kpt_with_conf, conf_thres=0.3)
-            #cv2.imwrite(os.path.join(args.output_dir, os.path.relpath(f, args.image_dir)), draw_image)
-            
-            #print(kpt_with_conf)
+
             
             return kpt_with_conf
 
@@ -39,6 +34,8 @@ if __name__ == "__main__":
     image = cv2.imread('./movenet/images/2021-10-27_183637.png')
     rets = infer.infer(image)
     print(rets)
+
+    # 人体姿态识别的输出的17个关键点，第三个参数是置信度
     '''
     [[0.11672449 0.4983359  0.53861076]
      [0.09518386 0.52236164 0.8093194 ]
