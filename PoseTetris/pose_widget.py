@@ -40,30 +40,32 @@ class CPoseWidget(QWidget, cUi):
         self.sliderAccu.hide()
         self.editAccu.hide()
         
-        self.setMouseTracking(True)
-        self.pose_name = pose_name
-        self.labelTitle.setText(LANGE_TRANS_MAP[self.pose_name])
-        self.reset_cfg_file = './cfgs/' + self.pose_name + '_reset.json'
-        self.modify_cfg_file = './cfgs/' + self.pose_name + '_modify.json'
-        self.reset_map = None
-        self.point_map = None    
-        self.catched_point = None
-        self.catched_line = -1
-        self.modify_flag = False
-        self.load_cfg_file()
+        self.setMouseTracking(True) #开启鼠标检测
+        self.pose_name = pose_name #用构造函数的参数 2 命名这个对象的名字
+        self.labelTitle.setText(LANGE_TRANS_MAP[self.pose_name]) # 将标签内容设为全局字典中，对象名所对应的功能解释（中文）
+        self.reset_cfg_file = './cfgs/' + self.pose_name + '_reset.json'# 默认各关节点的 json 文件路径
+        self.modify_cfg_file = './cfgs/' + self.pose_name + '_modify.json'# 保存用户自定义的各关节点的 json 文件路径
+        self.reset_map = None#默认各关节点的集合
+        self.point_map = None    #用户自定义的各关节点的集合
+        self.catched_point = None#记录当前在拖拽的点（元组[x,y]），将来执行操作
+        self.catched_line = -1#当前在拖拽的线
+        self.modify_flag = False#记录用户是否已自定义
+        self.load_cfg_file()#加载数据
         
         
     def on_sliderAccu_valueChanged(self):
         value = self.sliderAccu.value()
         print('now value is:', value)
         self.editAccu.setText('%d%%'%value)
-        
+
+    #通过在构造函数中已初始化的文件路径，读取 json 文件中对应关节的坐标。结果分别保存早 reset_map 元组和 point_map 元组中。
     def load_cfg_file(self):
         with open(self.reset_cfg_file, 'r') as f:
             self.reset_map = json.load(f)
         with open(self.modify_cfg_file, 'r') as f:
             self.point_map = json.load(f)
-       
+
+    #将用户自定义好的数据 point_map 保存到 json 文件中。在点击“重置姿态”按钮或者“开始游戏”按钮时执行。
     def save_cfg_file(self):
         save_map = copy.deepcopy(self.point_map)
         if 'key_score' in save_map.keys():
@@ -88,6 +90,7 @@ class CPoseWidget(QWidget, cUi):
         line12 = [pos_map['r_knee'], pos_map['r_ankle']] 
         return [line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12]
 
+    # 判断两点之间的距离是否小于 radio
     def _check_distance(self, point1, point2, radio):
         if abs(point1[0] - point2[0]) >= (0-radio) and abs(point1[0] - point2[0]) <= radio \
             and abs(point1[1] - point2[1]) >= (0-radio) and abs(point1[1] - point2[1]) <= radio:
@@ -139,7 +142,8 @@ class CPoseWidget(QWidget, cUi):
         print('\'r_knee\':     [%.2f, %.2f],'%(self.reset_map['r_knee'][0], self.reset_map['r_knee'][1]))
         print('\'r_ankle\':    [%.2f, %.2f],'%(self.reset_map['r_ankle'][0], self.reset_map['r_ankle'][1]))
         return self.point_map
-        
+
+    # 获取与鼠标当前位置最近的关节点
     def mouse_catch_point(self, mouse_x, mouse_y, radio=0.01):          
         for key in self.point_map.keys():
             if key == 'key_line' or key == 'key_score':
@@ -149,7 +153,8 @@ class CPoseWidget(QWidget, cUi):
                 self.catched_point = key
                 return
         self.catched_point = None
-        
+
+    # 获取与鼠标当前位置最近的肢体线
     def mouse_catch_line(self, mouse_x, mouse_y, radio=0.01):
         std_lines = self._get_lines(self.point_map)
         for i,line in enumerate(std_lines):
